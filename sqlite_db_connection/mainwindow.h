@@ -30,6 +30,7 @@ class MainWindow:public QMainWindow
 
 public:
     MainWindow();
+    bool g_DB_Connection;
 
 private:
     QString host, user, passwd, database;
@@ -56,6 +57,7 @@ private:
     void create_action();
     void create_mainWidget();
     void db_connect();
+    void db_table_init();
 
 private slots:
     void slot_ToolBar_add();

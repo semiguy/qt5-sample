@@ -9,6 +9,7 @@
 #include <QList>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QDir>
 
 MainWindow::MainWindow()
 {
@@ -19,7 +20,6 @@ MainWindow::MainWindow()
 
     qDebug() << QSqlDatabase::drivers() << endl;
     db_connect();
-
     setWindowTitle(codec->toUnicode("주소관리"));
 }
 
@@ -108,15 +108,43 @@ void MainWindow::create_mainWidget()
 
 void MainWindow::db_connect()
 {
+    // SQLlite3 database driver
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
 
-    db.setDatabaseName("qttest.db");
+    //db.setDatabaseName(path);
+    db.setDatabaseName("contacts.db");
 
     if(!db.open()) {
         statusBar()->showMessage(codec->toUnicode("DB 접속 실패 하였습니다."));
+        g_DB_Connection = false;
     } else {
         statusBar()->showMessage(codec->toUnicode("DB에 접속 하였습니다."));
+        g_DB_Connection = true;
+        db_table_init();
     }
+}
+
+void MainWindow::db_table_init()
+{
+    if(g_DB_Connection) {
+        //QDir dbPath;
+        //QString path = dbPath.currentPath() + "/contacts.db";
+        QSqlQuery query;
+
+        // sqlite3 create table
+        QString text_query = QString("CREATE TABLE IF NOT EXISTS address "
+                                     "(num INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+                                     "name TEXT NOT NULL, "
+                                     "tel TEXT NOT NULL, "
+                                     "address TEXT NOT NULL)"
+                                     );
+        //qDebug() << path;
+        qDebug() << text_query;
+        query.exec(codec->fromUnicode(text_query));
+    } else {
+        qDebug("MainWindow::db_table_init:g_DB_Connection false !!");
+    }
+
 }
 
 void MainWindow::create_action()
